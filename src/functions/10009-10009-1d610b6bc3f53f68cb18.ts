@@ -10,6 +10,7 @@ import { Engine, EngineResult } from "json-rules-engine";
 // imports comunes
 import * as https from "https";
 import * as HttpModule from "../utils/HttpModule";
+import { ServiceBusClient, ServiceBusMessage } from '@azure/service-bus';
 
 const connectionString = process.env["AzureQueues"];
 const topicName = "outlook-forward-service"
