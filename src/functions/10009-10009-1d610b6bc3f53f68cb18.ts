@@ -97,60 +97,6 @@ df.app.activity("runEngine", {
   handler: runEngine,
 });
 
-const ModelClassification: ActivityHandler = async function (
-    input: string,
-    context: InvocationContext,
-): Promise<String[]> {
-    context.log("TypeScript Activity. ModelClassification")
-    const nlpEndpoint = "https://api.wholemeaning.com/api/v1/model/tester";
-    const nlpToken = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiI4NEJiRXdrVG02Mm9PQ1Brd24wQ0gxSmJMeDJ2aEFpMSIsIm1vZGVsIjoxMzE0LCJsYW5ndWFnZSI6ImVzIiwiY3VzdG9tZXIiOjYzfQ.NEDfusL945y1rWf7wqOSG1m-HAAAeGqanmSXSzHRpoA"; // Replace with your actual access token
-    const requestOptions: https.RequestOptions = {
-        method: "POST",
-        headers: {
-            Authorization: `Bearer ${nlpToken}`,
-            "Content-Type": "application/json"
-        }
-    };
-    const postData = JSON.stringify({
-        text: input
-    });
-    const response = await HttpModule.sendHttpRequest(nlpEndpoint, postData, requestOptions);
-    context.log("Response from NLP: ------------------------------------" + response.toString());
-    const classifications = JSON.parse(response.toString())["classifications"];
-    context.log("Classifications: ------------------------------------" + classifications);
-    return classifications.flatMap(classif => classif.classes.map(classInfo => classInfo.name.toLowerCase()));
-};
-df.app.activity("ModelClassification", {
-    handler: ModelClassification
-});
-
-const Derive: ActivityHandler = async function (
-  input: any,
-  context: InvocationContext,
-) {
-  context.log("Derivando ----------------------------------------------")
-  const serviceBusClient = new ServiceBusClient(connectionString);
-  const sender = serviceBusClient.createSender(topicName);
-
-  try {
-      // Convert data to bytes or use a serializer based on your data format
-      const message: ServiceBusMessage = {
-          body: input,
-          subject: "email"
-      };
-
-      await sender.sendMessages(message);
-      context.log(`Data sent to the Service Bus queue-----------------------------------------------`);
-  } finally {
-      await sender.close();
-      await serviceBusClient.close();
-      context.log(`Error sending data to the Service Bus queue-----------------------------------------------`);
-  }
-}
-
-df.app.activity("derive", {
-  handler: Derive
-});
 const durableOrchestrator: OrchestrationHandler = function* (
     context: OrchestrationContext
   ) {
